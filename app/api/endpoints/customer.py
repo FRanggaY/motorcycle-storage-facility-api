@@ -10,8 +10,6 @@ from app.utils.manual import get_total_pages
 
 router = APIRouter()
 
-duplicated_message = r"Duplicate entry '(.*?)' for key"
-
 @router.post("", response_model=GeneralDataResponse, status_code=status.HTTP_200_OK)
 def create_customer(create_customer: CreateCustomer, db: Session = Depends(get_db)):
     """
@@ -21,22 +19,8 @@ def create_customer(create_customer: CreateCustomer, db: Session = Depends(get_d
 
     try:
         data = customer_service.create_customer(create_customer)
-    except Exception as error:
-        print(f"on customer :  {str(error)}")
-        error_message = str(error)
-        match = re.search(duplicated_message, error_message)
-    
-        if match:
-            duplicated_value = match.group(1)
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail=f"customer with the title '{duplicated_value}' already exists."
-            )
-        else:
-            raise HTTPException(
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail="An unexpected integrity error occurred. Please try again later."
-            )
+    except ValueError as error:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(error))
 
     status_code = status.HTTP_201_CREATED
     auth_response = GeneralDataResponse(
@@ -58,22 +42,8 @@ def update_customer(id:int, edit_customer: EditCustomer, db: Session = Depends(g
 
     try:
         data = customer_service.update_customer(id=id, data=edit_customer)
-    except Exception as error:
-        print(f"on customer :  {str(error)}")
-        error_message = str(error)
-        match = re.search(duplicated_message, error_message)
-    
-        if match:
-            duplicated_value = match.group(1)
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail=f"customer with the title '{duplicated_value}' already exists."
-            )
-        else:
-            raise HTTPException(
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail="An unexpected integrity error occurred. Please try again later."
-            )
+    except ValueError as error:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(error))
 
     status_code = status.HTTP_200_OK
     auth_response = GeneralDataResponse(

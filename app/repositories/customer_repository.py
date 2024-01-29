@@ -19,6 +19,9 @@ class CustomerRepository:
 
         return query.all()
     
+    def read_customer_by_name(self, name: str) -> Customer:
+        return self.db.query(Customer).filter(Customer.name == name).first()
+    
     def read_customer(self, id: str) -> Customer:
         result = self.db.query(Customer).filter(Customer.id == id).first()
         if not result:
@@ -32,6 +35,9 @@ class CustomerRepository:
             no_hp=data.no_hp,
         )
 
+        if self.read_customer_by_name(data.name):
+            raise ValueError("Name already used")
+
         self.db.add(model)
         self.db.commit()
         return model
@@ -40,7 +46,11 @@ class CustomerRepository:
         result = self.read_customer(id)
 
         if data.name:
-            result.name = data.name
+            existing_data = self.read_customer_by_name(data.name)
+            if existing_data and existing_data.id != result.id:
+                raise ValueError("Customer with the same name already exists. Please choose a different name.")
+            else:
+                result.name = data.name
         
         if data.no_hp:
             result.no_hp = data.no_hp

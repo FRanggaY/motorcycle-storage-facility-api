@@ -23,6 +23,9 @@ class ItemRepository:
 
         return query.all()
     
+    def read_item_by_title(self, title: str) -> Item:
+        return self.db.query(Item).filter(Item.title == title).first()
+    
     def read_item(self, id: str) -> Item:
         result = self.db.query(Item).filter(Item.id == id).first()
         if not result:
@@ -36,6 +39,9 @@ class ItemRepository:
             brand=data.brand.lower(),
         )
 
+        if self.read_item_by_title(data.title):
+            raise ValueError("Title already used")
+
         self.db.add(model)
         self.db.commit()
         return model
@@ -44,7 +50,11 @@ class ItemRepository:
         result = self.read_item(id)
 
         if data.title:
-            result.title = data.title
+            existing_data = self.read_item_by_title(data.title)
+            if existing_data and existing_data.id != result.id:
+                raise ValueError("Item with the same title already exists. Please choose a different title.")
+            else:
+                result.title = data.title
         
         if data.brand:
             result.brand = data.brand

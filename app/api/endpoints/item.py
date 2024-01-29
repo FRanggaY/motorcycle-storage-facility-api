@@ -10,8 +10,6 @@ from app.utils.manual import get_total_pages
 
 router = APIRouter()
 
-duplicated_message = r"Duplicate entry '(.*?)' for key"
-
 @router.post("", response_model=GeneralDataResponse, status_code=status.HTTP_200_OK)
 def create_item(create_item: CreateItem, db: Session = Depends(get_db)):
     """
@@ -23,22 +21,8 @@ def create_item(create_item: CreateItem, db: Session = Depends(get_db)):
 
     try:
         data = item_service.create_item(create_item)
-    except Exception as error:
-        print(f"on item :  {str(error)}")
-        error_message = str(error)
-        match = re.search(duplicated_message, error_message)
-    
-        if match:
-            duplicated_value = match.group(1)
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail=f"Item with the title '{duplicated_value}' already exists."
-            )
-        else:
-            raise HTTPException(
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail="An unexpected integrity error occurred. Please try again later."
-            )
+    except ValueError as error:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(error))
 
     status_code = status.HTTP_201_CREATED
     auth_response = GeneralDataResponse(
@@ -60,22 +44,8 @@ def update_item(id:int, edit_item: EditItem, db: Session = Depends(get_db)):
 
     try:
         data = item_service.update_item(id=id, data=edit_item)
-    except Exception as error:
-        print(f"on item :  {str(error)}")
-        error_message = str(error)
-        match = re.search(duplicated_message, error_message)
-    
-        if match:
-            duplicated_value = match.group(1)
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail=f"Item with the title '{duplicated_value}' already exists."
-            )
-        else:
-            raise HTTPException(
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail="An unexpected integrity error occurred. Please try again later."
-            )
+    except ValueError as error:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(error))
 
     status_code = status.HTTP_200_OK
     auth_response = GeneralDataResponse(
