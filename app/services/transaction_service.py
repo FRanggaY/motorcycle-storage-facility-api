@@ -28,8 +28,8 @@ class TransactionService:
     def read_transaction(self, id:str):
         return self.transaction_repository.read_transaction(id)
     
-    def delete_transaction(self, id:str):
-        return self.transaction_repository.delete_transaction(id)
+    def delete_transaction(self, id:str, folder_photo):
+        return self.transaction_repository.delete_transaction(id, folder_photo)
 
 
 

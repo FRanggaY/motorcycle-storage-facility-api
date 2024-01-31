@@ -1,9 +1,11 @@
+import os
 from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
 from app.dtos.transaction import CreateTransaction, EditTransaction
 from datetime import datetime, timedelta
 
 from app.models.transaction import Transaction
+from app.utils.handling_file import delete_file
 
 class TransactionRepository:
     def __init__(self, db: Session):
@@ -75,7 +77,7 @@ class TransactionRepository:
     def read_transaction(self, id: str) -> Transaction:
         result = self.db.query(Transaction).filter(Transaction.id == id).first()
         if not result:
-            raise ValueError("Data not found")
+            raise ValueError("Transaction not found")
 
         return result
 
@@ -136,8 +138,14 @@ class TransactionRepository:
         self.db.commit()
         return result
     
-    def delete_transaction(self, id: str):
-        self.read_transaction(id)
+    def delete_transaction(self, id: str, folder_photo):
+        data = self.read_transaction(id)
+
+        if len(data.transaction_photo_locations) > 0:
+            # deleting file
+            for location in data.transaction_photo_locations:
+                file_path = os.path.join(folder_photo, location.url_photo)
+                delete_file(file_path)
 
         self.db.query(Transaction).filter(Transaction.id == id).delete()
         self.db.commit()

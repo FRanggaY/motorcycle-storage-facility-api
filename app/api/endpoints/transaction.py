@@ -1,10 +1,11 @@
 from datetime import datetime
-from fastapi import APIRouter, Depends, Query, status, HTTPException
+from fastapi import APIRouter, Depends, Query, Request, status, HTTPException
 from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
 from app.database import get_db
 from app.dtos.transaction import CreateTransaction, EditTransaction
 from app.models.response import GeneralDataResponse, GeneralDataPaginateResponse
+from app.repositories.transaction_photo_location_repository import TransactionPhotoLocationRepository
 from app.services.transaction_service import TransactionService
 from app.services.customer_service import CustomerService
 from app.services.item_service import ItemService
@@ -46,14 +47,14 @@ def create_transaction(create_transaction: CreateTransaction, db: Session = Depe
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(error))
 
     status_code = status.HTTP_201_CREATED
-    auth_response = GeneralDataResponse(
+    data_response = GeneralDataResponse(
         code=status_code,
         status="OK",
         data={
             'id': data.id,
         },
     )
-    response = JSONResponse(content=auth_response.model_dump(), status_code=status_code)
+    response = JSONResponse(content=data_response.model_dump(), status_code=status_code)
     return response
 
 @router.patch("/{id}", response_model=GeneralDataResponse, status_code=status.HTTP_200_OK)
@@ -92,14 +93,14 @@ def update_transaction(id:int, edit_transaction: EditTransaction, db: Session = 
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(error))
 
     status_code = status.HTTP_200_OK
-    auth_response = GeneralDataResponse(
+    data_response = GeneralDataResponse(
         code=status_code,
         status="OK",
         data={
             'id': data.id,
         },
     )
-    response = JSONResponse(content=auth_response.model_dump(), status_code=status_code)
+    response = JSONResponse(content=data_response.model_dump(), status_code=status_code)
     return response
 
 @router.delete("/{id}", response_model=GeneralDataResponse, status_code=status.HTTP_200_OK)
@@ -108,9 +109,10 @@ def delete_transaction(id:int, db: Session = Depends(get_db)):
         Delete transaction
     """
     transaction_service = TransactionService(db)
+    transaction_photo_location_service = TransactionPhotoLocationRepository(db)
 
     try:
-        transaction_id = transaction_service.delete_transaction(id=id)
+        transaction_id = transaction_service.delete_transaction(id=id, folder_photo=transaction_photo_location_service.static_transaction_photo_location_folder_image)
     except Exception as error:
         print(f"on transaction :  {str(error)}")
         error_message = str(error)
@@ -120,21 +122,22 @@ def delete_transaction(id:int, db: Session = Depends(get_db)):
         )
 
     status_code = status.HTTP_200_OK
-    auth_response = GeneralDataResponse(
+    data_response = GeneralDataResponse(
         code=status_code,
         status="OK",
         data={
             'id': transaction_id,
         },
     )
-    response = JSONResponse(content=auth_response.model_dump(), status_code=status_code)
+    response = JSONResponse(content=data_response.model_dump(), status_code=status_code)
     return response
 
 @router.get("/{id}", response_model=GeneralDataResponse, status_code=status.HTTP_200_OK)
-def read_transaction(id:int, db: Session = Depends(get_db)):
+def read_transaction(id:int, request: Request = None, db: Session = Depends(get_db)):
     """
         Read transaction
     """
+    base_url = str(request.base_url) if request else ""
     transaction_service = TransactionService(db)
 
     try:
@@ -146,9 +149,19 @@ def read_transaction(id:int, db: Session = Depends(get_db)):
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=str(error_message)
         )
+    
+    attachment = []
+    if len(data.transaction_photo_locations) > 0:
+        # deleting file
+        for location in data.transaction_photo_locations:
+            attachment.append({
+                'id': location.id,
+                'title': location.title,
+                'url_photo': f"{base_url}static/transaction/image/{location.url_photo}" if location.url_photo else None,
+            })
 
     status_code = status.HTTP_200_OK
-    auth_response = GeneralDataResponse(
+    data_response = GeneralDataResponse(
         code=status_code,
         status="OK",
         data={
@@ -171,9 +184,10 @@ def read_transaction(id:int, db: Session = Depends(get_db)):
             'notes': data.notes,
             'plat_number': data.plat_number,
             'status': data.status,
+            'attachment': attachment,
         },
     )
-    response = JSONResponse(content=auth_response.model_dump(), status_code=status_code)
+    response = JSONResponse(content=data_response.model_dump(), status_code=status_code)
     return response
 
 @router.get("", response_model=GeneralDataPaginateResponse, status_code=status.HTTP_200_OK)
@@ -241,7 +255,7 @@ def read_transactions(
         )
 
     status_code = status.HTTP_200_OK
-    auth_response = GeneralDataPaginateResponse(
+    data_response = GeneralDataPaginateResponse(
         code=status_code,
         status="OK",
         data=datas,
@@ -252,5 +266,5 @@ def read_transactions(
             "offset": offset
         },
     )
-    response = JSONResponse(content=auth_response.model_dump(), status_code=status_code)
+    response = JSONResponse(content=data_response.model_dump(), status_code=status_code)
     return response
