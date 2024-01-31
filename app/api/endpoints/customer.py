@@ -22,14 +22,14 @@ def create_customer(create_customer: CreateCustomer, db: Session = Depends(get_d
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(error))
 
     status_code = status.HTTP_201_CREATED
-    auth_response = GeneralDataResponse(
+    data_response = GeneralDataResponse(
         code=status_code,
         status="OK",
         data={
             'name': data.name,
         },
     )
-    response = JSONResponse(content=auth_response.model_dump(), status_code=status_code)
+    response = JSONResponse(content=data_response.model_dump(), status_code=status_code)
     return response
 
 @router.patch("/{id}", response_model=GeneralDataResponse, status_code=status.HTTP_200_OK)
@@ -45,14 +45,14 @@ def update_customer(id:int, edit_customer: EditCustomer, db: Session = Depends(g
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(error))
 
     status_code = status.HTTP_200_OK
-    auth_response = GeneralDataResponse(
+    data_response = GeneralDataResponse(
         code=status_code,
         status="OK",
         data={
             'id': data.id,
         },
     )
-    response = JSONResponse(content=auth_response.model_dump(), status_code=status_code)
+    response = JSONResponse(content=data_response.model_dump(), status_code=status_code)
     return response
 
 @router.delete("/{id}", response_model=GeneralDataResponse, status_code=status.HTTP_200_OK)
@@ -73,14 +73,14 @@ def delete_customer(id:int, db: Session = Depends(get_db)):
         )
 
     status_code = status.HTTP_200_OK
-    auth_response = GeneralDataResponse(
+    data_response = GeneralDataResponse(
         code=status_code,
         status="OK",
         data={
             'id': customer_id,
         },
     )
-    response = JSONResponse(content=auth_response.model_dump(), status_code=status_code)
+    response = JSONResponse(content=data_response.model_dump(), status_code=status_code)
     return response
 
 @router.get("/{id}", response_model=GeneralDataResponse, status_code=status.HTTP_200_OK)
@@ -101,7 +101,7 @@ def read_customer(id:int, db: Session = Depends(get_db)):
         )
 
     status_code = status.HTTP_200_OK
-    auth_response = GeneralDataResponse(
+    data_response = GeneralDataResponse(
         code=status_code,
         status="OK",
         data={
@@ -110,7 +110,7 @@ def read_customer(id:int, db: Session = Depends(get_db)):
             'no_hp': data.no_hp,
         },
     )
-    response = JSONResponse(content=auth_response.model_dump(), status_code=status_code)
+    response = JSONResponse(content=data_response.model_dump(), status_code=status_code)
     return response
 
 @router.get("", response_model=GeneralDataPaginateResponse, status_code=status.HTTP_200_OK)
@@ -153,7 +153,7 @@ def read_customers(
         )
 
     status_code = status.HTTP_200_OK
-    auth_response = GeneralDataPaginateResponse(
+    data_response = GeneralDataPaginateResponse(
         code=status_code,
         status="OK",
         data=datas,
@@ -164,5 +164,5 @@ def read_customers(
             "offset": offset
         },
     )
-    response = JSONResponse(content=auth_response.model_dump(), status_code=status_code)
+    response = JSONResponse(content=data_response.model_dump(), status_code=status_code)
     return response
