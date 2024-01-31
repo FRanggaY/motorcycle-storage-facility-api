@@ -1,4 +1,3 @@
-import re
 from fastapi import APIRouter, Depends, Query, status, HTTPException
 from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
@@ -10,7 +9,7 @@ from app.utils.manual import get_total_pages
 
 router = APIRouter()
 
-@router.post("", response_model=GeneralDataResponse, status_code=status.HTTP_200_OK)
+@router.post("", response_model=GeneralDataResponse, status_code=status.HTTP_201_CREATED)
 def create_item(create_item: CreateItem, db: Session = Depends(get_db)):
     """
         Create Item
@@ -125,6 +124,7 @@ def read_items(
 ):
     """
         Read Items
+        - with pagination
     """
     item_service = ItemService(db)
 
@@ -138,7 +138,7 @@ def read_items(
             detail=str(error_message)
         )
     
-    count = item_service.item_repository.count_items()
+    count = item_service.item_repository.count_items(brand=brand)
     total_pages = get_total_pages(size, count)
     
     datas = []

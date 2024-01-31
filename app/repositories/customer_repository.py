@@ -25,7 +25,7 @@ class CustomerRepository:
     def read_customer(self, id: str) -> Customer:
         result = self.db.query(Customer).filter(Customer.id == id).first()
         if not result:
-            raise ValueError("Data not found")
+            raise ValueError("Customer not found")
 
         return result
 

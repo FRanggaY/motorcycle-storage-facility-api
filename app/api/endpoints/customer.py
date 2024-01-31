@@ -1,4 +1,3 @@
-import re
 from fastapi import APIRouter, Depends, Query, status, HTTPException
 from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
@@ -10,7 +9,7 @@ from app.utils.manual import get_total_pages
 
 router = APIRouter()
 
-@router.post("", response_model=GeneralDataResponse, status_code=status.HTTP_200_OK)
+@router.post("", response_model=GeneralDataResponse, status_code=status.HTTP_201_CREATED)
 def create_customer(create_customer: CreateCustomer, db: Session = Depends(get_db)):
     """
         Create customer
@@ -122,6 +121,7 @@ def read_customers(
 ):
     """
         Read customers
+        - with pagination
     """
     customer_service = CustomerService(db)
 
