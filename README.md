@@ -69,7 +69,7 @@ Duplicate .env.example and renamed it to .env
 
 Fill this variable in .env
 ```sh
-POSTGRE_URL="mysql+pymysql://{username}:{password}@{host}:{port}/{database}"
+DB="mysql+pymysql://{username}:{password}@{host}:{port}/{database}"
 ```
 
 You can customize port of deploy web
