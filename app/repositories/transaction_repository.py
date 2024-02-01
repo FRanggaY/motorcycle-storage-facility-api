@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 from app.dtos.transaction import CreateTransaction, EditTransaction
 from datetime import datetime, timedelta
 
-from app.models.transaction import Transaction
+from app.models.transaction import Transaction, TransactionStatus
 from app.utils.handling_file import delete_file
 
 class TransactionRepository:
@@ -54,6 +54,7 @@ class TransactionRepository:
         customer_id: int = None, 
         item_id: int = None, 
         date_come: str = None, 
+        status: TransactionStatus = None,
         offset: int = None, 
         size: int = None
     ):
@@ -67,6 +68,9 @@ class TransactionRepository:
        
         if date_come is not None:
             query = query.filter(Transaction.date_come == date_come)
+        
+        if status is not None:
+            query = query.filter(Transaction.status == status)
 
         if offset is not None and size is not None:
             query = query.offset((offset - 1) * size).limit(size)

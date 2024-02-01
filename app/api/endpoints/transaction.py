@@ -5,6 +5,7 @@ from sqlalchemy.orm import Session
 from app.database import get_db
 from app.dtos.transaction import CreateTransaction, EditTransaction
 from app.models.response import GeneralDataResponse, GeneralDataPaginateResponse
+from app.models.transaction import TransactionStatus
 from app.repositories.transaction_photo_location_repository import TransactionPhotoLocationRepository
 from app.services.transaction_service import TransactionService
 from app.services.customer_service import CustomerService
@@ -195,6 +196,7 @@ def read_transactions(
     item_id:int = Query(None),
     customer_id:int = Query(None),
     date_come:str = Query(None),
+    transaction_status:TransactionStatus = Query(None),
     offset: int = Query(None, ge=1), 
     size: int = Query(None, ge=1),
     db: Session = Depends(get_db)
@@ -210,6 +212,7 @@ def read_transactions(
             item_id=item_id,
             customer_id=customer_id,
             date_come=date_come,
+            status=transaction_status.value if transaction_status else None,
             offset=offset,
             size=size
         )

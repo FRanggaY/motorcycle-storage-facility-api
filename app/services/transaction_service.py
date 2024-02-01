@@ -1,6 +1,7 @@
 from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
 from app.dtos.transaction import CreateTransaction, EditTransaction
+from app.models.transaction import TransactionStatus
 
 from app.repositories.transaction_repository import TransactionRepository
 
@@ -20,10 +21,11 @@ class TransactionService:
         customer_id: int = None,
         item_id: int = None,
         date_come: str = None,
+        status: TransactionStatus = None,
         offset:int = None, 
         size:int = None
     ):
-        return self.transaction_repository.read_transactions(customer_id, item_id, date_come, offset, size)
+        return self.transaction_repository.read_transactions(customer_id, item_id, date_come, status, offset, size)
     
     def read_transaction(self, id:str):
         return self.transaction_repository.read_transaction(id)
