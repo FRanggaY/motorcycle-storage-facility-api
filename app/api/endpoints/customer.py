@@ -47,7 +47,7 @@ def update_customer(id:int, edit_customer: EditCustomer, db: Session = Depends(g
     status_code = status.HTTP_200_OK
     data_response = GeneralDataResponse(
         code=status_code,
-        status="OK",
+        status="CREATED",
         data={
             'id': data.id,
         },

@@ -40,7 +40,7 @@ async def create_transaction_photo_location(
     status_code = status.HTTP_201_CREATED
     data_response = GeneralDataResponse(
         code=status_code,
-        status="OK",
+        status="CREATED",
         data={
             'id': data.id,
         },

@@ -34,7 +34,8 @@ class TransactionRepository:
         self,
         customer_id: int = None, 
         item_id: int = None, 
-        date_come: str = None, 
+        date_come: str = None,
+        status: TransactionStatus = None,
     ):
         query = self.db.query(Transaction)
 
@@ -46,6 +47,9 @@ class TransactionRepository:
        
         if date_come is not None:
             query = query.filter(Transaction.date_come == date_come)
+
+        if status is not None:
+            query = query.filter(Transaction.status == status)
 
         return query.count()
 

@@ -50,7 +50,7 @@ def create_transaction(create_transaction: CreateTransaction, db: Session = Depe
     status_code = status.HTTP_201_CREATED
     data_response = GeneralDataResponse(
         code=status_code,
-        status="OK",
+        status="CREATED",
         data={
             'id': data.id,
         },
@@ -227,7 +227,8 @@ def read_transactions(
     count = transaction_service.transaction_repository.count_transactions(
         item_id=item_id,
         customer_id=customer_id,
-        date_come=date_come
+        date_come=date_come,
+        status=transaction_status.value if transaction_status else None,
     )
     total_pages = get_total_pages(size, count)
     
