@@ -20,6 +20,7 @@ class Config(BaseSettings):
     DB_POOL_RECYCLE: int = 1800
     DB_ECHO: bool = False
 
+    PORT: int = 5002
 
 
 config = Config()
