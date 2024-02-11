@@ -26,6 +26,7 @@ def create_customer(create_customer: CreateCustomer, db: Session = Depends(get_d
         code=status_code,
         status="OK",
         data={
+            'id': data.id,
             'name': data.name,
         },
     )

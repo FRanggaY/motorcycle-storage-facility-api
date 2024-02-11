@@ -139,6 +139,12 @@ upgrade file
 alembic upgrade head
 ```
 
+upgrade file from exec container
+
+```sh
+docker exec -it <container_id_or_name> alembic upgrade head
+```
+
 downgrade latest file
 
 
