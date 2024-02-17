@@ -248,6 +248,8 @@ def read_transactions(
             },
             'date_come': str(transaction.date_come) if transaction.date_come else None,
             'date_out': str(transaction.date_out) if transaction.date_out else None,
+            'cost_hourly': transaction.cost_hourly,
+            'cost_daily': transaction.cost_daily,
             'cost_final': transaction.cost_final,
             'status': transaction.status,
         })
